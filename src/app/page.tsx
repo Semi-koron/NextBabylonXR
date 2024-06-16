@@ -1,95 +1,50 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+import React from "react";
+import Style from "./page.module.css";
+import * as BABYLON from "babylonjs";
+import { Engine, Scene, FreeCamera } from "babylonjs";
 
 export default function Home() {
+  let canvas: HTMLCanvasElement;
+  let engine: Engine;
+  let scene: Scene;
+
+  // シーンをセットアップする
+  const setupScene = async () => {
+    canvas = (await document.getElementById(
+      "renderCanvas"
+    )) as HTMLCanvasElement;
+    engine = new Engine(canvas, true);
+    scene = new Scene(engine);
+    scene.clearColor = new BABYLON.Color4(0.1, 0.1, 0.1, 1);
+    // カメラを生成する
+    const camera = new FreeCamera(
+      "camera",
+      new BABYLON.Vector3(0, 5, -10),
+      scene
+    );
+    camera.setTarget(BABYLON.Vector3.Zero());
+    camera.attachControl(canvas, true);
+    // メッシュを生成する
+    const box = BABYLON.MeshBuilder.CreateBox("box", { size: 1 }, scene);
+    box.position.y = 1;
+    // ライトを生成する
+    const light = new BABYLON.HemisphericLight(
+      "light",
+      new BABYLON.Vector3(0, 1, 0),
+      scene
+    );
+    // レンダリングする
+    engine.runRenderLoop(() => {
+      scene.render();
+    });
+  };
+
+  setupScene();
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    <div>
+      <canvas id="renderCanvas" className={Style.canvas}></canvas>
+    </div>
   );
 }
